@@ -1,42 +1,53 @@
-def operators_idx(o):
-    if o == '^':
-        return 3
-    elif o in '*/':
-        return 2
-    elif o in '+-':
-        return 1
-    else:
-        return -1
+class Stack:
+    def __init__(self):
+        self.items = []
     
-def infix_to_postfix(s):
-    stack = []
-    result = ''
+    def push(self, item):
+        self.items.append(item)
     
-    for char in s:
+    def pop(self):
+        return self.items.pop() if not self.is_empty() else None
+    
+    def peek(self):
+        return self.items[-1] if not self.is_empty() else None
+    
+    def is_empty(self):
+        return len(self.items) == 0
+    
+    def size(self):
+        return len(self.items)
+
+def get_precedence(operator):
+    precedence = {'^': 3, '*': 2, '/': 2, '+': 1, '-': 1}
+    return precedence.get(operator, -1)
+
+def infix_to_postfix(expression):
+    stack = Stack()
+    postfix = []
+    
+    for char in expression:
         if char.isalnum():
-            result += char
-            
+            postfix.append(char)
         elif char == '(':
-            stack.append(char)
+            stack.push(char)
         elif char == ')':
-            while stack and stack[-1] != '(':
-                result += stack.pop()
-            stack.pop()
-            
+            while not stack.is_empty() and stack.peek() != '(':
+                postfix.append(stack.pop())
+            stack.pop() 
         else:
-            while (stack and operators_idx(stack[-1]) >= operators_idx(char)):
-                result += stack.pop()
-            stack.append(char)
-            
-    while stack:
-        result += stack.pop()
-        
-    return result
+            while (not stack.is_empty() and 
+                   get_precedence(stack.peek()) >= get_precedence(char)):
+                postfix.append(stack.pop())
+            stack.push(char)
+    
+    while not stack.is_empty():
+        postfix.append(stack.pop())
+    
+    return ''.join(postfix)
 
 def main():
-    usr_input = input("Enter Infix : ")
-    postfix = infix_to_postfix(usr_input)
-    print(f"Postfix : {postfix}")
-    
+    infix_expression = input("Enter Infix : ")
+    print(f"Postfix : {infix_to_postfix(infix_expression)}")
+
 if __name__ == "__main__":
     main()

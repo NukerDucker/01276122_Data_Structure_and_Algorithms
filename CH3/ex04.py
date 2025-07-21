@@ -1,68 +1,59 @@
-class Calculator:
+class Stack:
     def __init__(self):
-        self.stack = []
-
-    def plus(self, a, b):
-        return a + b
-
-    def minus(self, a, b):
-        return a - b
-
-    def multiply(self, a, b):
-        return a * b
-
-    def divide(self, a, b):
-        if b == 0:
-            raise ValueError("Division by zero")
-        return a / b
-
-    def push(self, value):
-        if isinstance(value, int):
-            self.stack.append(value)
+        self.items = []
+    def __getitem__(self, index):
+        return self.items[index]
+    def push(self, item):
+        self.items.append(item)
+    def pop(self):
+        return self.items.pop() if not self.is_empty() else None
+    def peek(self):
+        return self.items[-1] if not self.is_empty() else None
+    def is_empty(self):
+        return len(self.items) == 0
+    def size(self):
+        return len(self.items)
+    
+class Calculator:
+    OPERATIONS = {
+        '+': lambda a, b: a + b,
+        '-': lambda a, b: a - b,
+        '*': lambda a, b: a * b,
+        '/': lambda a, b: a // b if b != 0 else None,
+        'DUP': lambda stack: stack.push(stack.peek()),
+        'POP': lambda stack: stack.pop()
+    }
+    
+    def __init__(self):
+        self.stack = Stack()
+        
+    def _perform_operation(self, operator, a, b):
+        return self.OPERATIONS[operator](a, b)
 
     def run(self, s):
         instructions = s.split()
-        i = 0
-        while i < len(instructions):
-            instruction = instructions[i]
-            if instruction.isdigit():
-                self.push(int(instruction))
+        
+        for instruction in instructions:
+            if not instruction.isdigit() and (instruction not in self.OPERATIONS):
+                return f"Invalid instruction: {instruction}"
+            elif instruction.isdigit():
+                self.stack.push(int(instruction))
 
             elif instruction in ('+', '-', '*', '/'):
-
                 a = self.stack.pop()
                 b = self.stack.pop()
-                
-                if instruction == '+':
-                    self.push(self.plus(a, b))
-                elif instruction == '-':
-                    self.push(self.minus(a, b))
-                elif instruction == '*':
-                    self.push(self.multiply(a, b))
-                elif instruction == '/':
-                    try:
-                        self.push(int(self.divide(a, b)))
-                    except ValueError as e:
-                        print(e)
-                        return
-            elif instruction == 'DUP':
-                self.push(self.stack[-1])
-            elif instruction == 'POP':
-                self.stack.pop()
+                self.stack.push(self.OPERATIONS[instruction](a, b))
             else:
-                print(f"Invalid instruction: {instruction}")
-                return
-            i += 1
-        if self.stack:
-            print(self.stack[-1])
-        else:
-            print("0")
+                self.OPERATIONS[instruction](self.stack)
+            
+        return self.stack.peek() if not self.stack.is_empty() else 0
 
 def main():
     print("* Stack Calculator *")
     usr_input = input("Enter arguments : ")
     calculator = Calculator()
-    calculator.run(usr_input)
+    result = calculator.run(usr_input)
+    print(result)
 
 if __name__ == "__main__":
     main()
