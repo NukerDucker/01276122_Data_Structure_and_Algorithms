@@ -8,27 +8,27 @@ class Queue:
     def __getitem__(self, index):
         return self._items[index]
     
+    @property
     def is_empty(self):
         return len(self._items) == 0
 
+    @property
     def size(self):
         return len(self._items)
+
+    @property
+    def peek(self):
+        return self._items[0] if not self.is_empty else None
 
     def enqueue(self, item):
         self._items.append(item)
 
     def dequeue(self):
-        if self.is_empty():
-            return None
-        return self._items.pop(0)
+        return self._items.pop(0) if not self.is_empty else None
     
     def popleft(self):
         self.dequeue()
         
-    def peek(self):
-        if self.is_empty():
-            return None
-        return self._items[0]
     
 def has_bomb(stack):
     return len(stack) >= 3 and stack[-1] == stack[-2] == stack[-3]
@@ -60,8 +60,8 @@ def process_normal(normal_side, blocking_queue):
     for char in normal_side:
         stack.append(char)
         while has_bomb(stack):
-            if not blocking_queue.is_empty():
-                blocked_char = blocking_queue[0] 
+            if not blocking_queue.is_empty:
+                blocked_char = blocking_queue.peek
                 if blocked_char == stack[-1]:
                     stack.pop()
                     stack.pop()

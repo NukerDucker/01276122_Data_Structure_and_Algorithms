@@ -82,5 +82,6 @@ def main():
     print(" ***Cafe***")
     log = input("Log : ")
     simulate(log)
+    
 if __name__ == "__main__":
     main()
