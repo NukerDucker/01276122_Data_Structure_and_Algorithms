@@ -27,7 +27,7 @@ def parentheses_checker(s):
         if char in parentheses:
             stack.push(char)
         elif char in parentheses.values():
-            if not stack or parentheses[stack[-1]] != char:
+            if not stack or parentheses[stack.peek()] != char:
                 missing += 1
             else:
                 stack.pop()

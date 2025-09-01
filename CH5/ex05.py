@@ -1,3 +1,4 @@
+import timeit
 class Node:
     def __init__(self, data):
         self.data = data
@@ -5,7 +6,7 @@ class Node:
         
 class LinkedList:
     def __init__(self):
-        self.head = None
+        self.head = None 
         self.tail = None
 
     def append(self, data):
@@ -71,7 +72,7 @@ def check_all_same(ll):
     while current:
         if current.data != first_value:
             return False
-        current = current.next
+        current = current.next 
         
     return True
 
@@ -156,4 +157,5 @@ def main():
     print("After  Radix Sort :", ll_sorted)
 
 if __name__ == "__main__":
-    main()
+    execution_time = timeit.timeit(lambda: main(), number=1)
+    print(f"Execution time: {execution_time:.6f} seconds")

@@ -17,6 +17,7 @@ class Stack:
     def pop(self):
         return self._items.pop() if not self.is_empty() else None
     
+    @property
     def peek(self):
         return self._items[-1] if not self.is_empty() else None
     
@@ -36,7 +37,7 @@ def parentheses_checker(expression):
         elif char in pairs.values():
             if not stack:
                 return f"{expression} close paren excess"
-            if pairs[stack[-1]] != char:
+            if pairs[stack.peek] != char:
                 return f"{expression} Unmatch open-close"
             stack.pop()
     
