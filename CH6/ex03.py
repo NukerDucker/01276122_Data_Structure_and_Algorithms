@@ -6,6 +6,7 @@ def gcd(a, b):
 def main():
     usr = input("Enter Input : ")
     a, b = map(int, usr.split()) 
+    
     if a == 0 and b == 0:
         print("Error! must be not all zero.")
         return
