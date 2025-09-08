@@ -1,24 +1,17 @@
 
-A = []
-B = []
-C = []
+A, B, C = [], [], []
 
 def display_rods(n):
     if n == 0:
         return
-    a = str(A[n-1]) if n-1 < len(A) else '|'
+    a = str(A[n-1]) if n-1 < len(A) else '|' 
     b = str(B[n-1]) if n-1 < len(B) else '|'
     c = str(C[n-1]) if n-1 < len(C) else '|'
     print(f"{a}{b:^5}{c}")
     display_rods(n - 1)
 
 def source_name(rod):
-    if rod is A:
-        return 'A'
-    elif rod is B:
-        return 'B'
-    else:
-        return 'C'
+    return 'A' if rod is A else 'B' if rod is B else 'C'
 
 def move(n, A, B, C):
     if n == 1:
@@ -34,9 +27,7 @@ def move(n, A, B, C):
 def main():
     global A, B, C
     n = int(input("Enter Input : "))
-    A = list(range(n, 0, -1))
-    B = []
-    C = []
+    A, B, C = list(range(n, 0, -1)), [], []
 
     display_rods(n + 1)
     move(n, A, C, B)
