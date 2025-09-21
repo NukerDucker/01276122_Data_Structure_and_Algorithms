@@ -2,23 +2,20 @@ class AVLTree:
     class AVLNode:
         def __init__(self, data, left=None, right=None):
             self.data = data
-            self.left = left
-            self.right = right
+            self.left = self.right = None
             self.height = 0
 
         def __str__(self):
             return str(self.data)
-        
-        def setHeight(self):
-            left_height = self.getHeight(self.left)
-            right_height = self.getHeight(self.right)
-            self.height = 1 + max(left_height, right_height)
 
-        def getHeight(self, node):
+        def set_height(self):
+            self.height = 1 + max(self.get_height(self.left), self.get_height(self.right))
+
+        def get_height(self, node):
             return -1 if node is None else node.height
-        
-        def balanceValue(self):    
-            return self.getHeight(self.right) - self.getHeight(self.left)
+
+        def balance(self):
+            return self.get_height(self.right) - self.get_height(self.left)
 
     def __init__(self, root=None):
         self.root = root
@@ -30,81 +27,79 @@ class AVLTree:
     def _add(root, data):
         if root is None:
             return AVLTree.AVLNode(data)
-        
+
         if data < root.data:
             root.left = AVLTree._add(root.left, data)
         else:
             root.right = AVLTree._add(root.right, data)
 
-        root.setHeight()
-        
-        balance = root.balanceValue()
+        root.set_height()
+        balance = root.balance()
 
         if balance > 1:
-            if root.right.balanceValue() < 0:
-                root.right = AVLTree.rotateRightChild(root.right)
-            return AVLTree.rotateLeftChild(root)
+            if root.right.balance() < 0:
+                root.right = AVLTree.rotate_right(root.right)
+            return AVLTree.rotate_left(root)
 
         if balance < -1:
-            if root.left.balanceValue() > 0:
-                root.left = AVLTree.rotateLeftChild(root.left)
-            return AVLTree.rotateRightChild(root)
+            if root.left.balance() > 0:
+                root.left = AVLTree.rotate_left(root.left)
+            return AVLTree.rotate_right(root)
 
         return root
 
     @staticmethod
-    def rotateLeftChild(root):
+    def rotate_left(root):
         new_root = root.right
         root.right = new_root.left
         new_root.left = root
-
-        root.setHeight()
-        new_root.setHeight()
+        root.set_height()
+        new_root.set_height()
         return new_root
 
     @staticmethod
-    def rotateRightChild(root):
+    def rotate_right(root):
         new_root = root.left
         root.left = new_root.right
         new_root.right = root
-
-        root.setHeight()
-        new_root.setHeight()
+        root.set_height()
+        new_root.set_height()
         return new_root
 
-    def postOrder(self):
+    def post_order(self):
         print("AVLTree post-order : ", end='')
-        AVLTree._postOrder(self.root)
+        AVLTree._post_order(self.root)
         print()
 
     @staticmethod
-    def _postOrder(root):
-        if root is not None:
-            AVLTree._postOrder(root.left)
-            AVLTree._postOrder(root.right)
+    def _post_order(root):
+        if root:
+            AVLTree._post_order(root.left)
+            AVLTree._post_order(root.right)
             print(root.data, end=' ')
 
-    def printTree(self):
-        AVLTree._printTree(self.root)
+    def print_tree(self):
+        AVLTree._print_tree(self.root)
 
     @staticmethod
-    def _printTree(node, level=0):
-        if not node is None:
-            AVLTree._printTree(node.right, level + 1)
+    def _print_tree(node, level=0):
+        if node:
+            AVLTree._print_tree(node.right, level + 1)
             print('     ' * level, node.data)
-            AVLTree._printTree(node.left, level + 1)
+            AVLTree._print_tree(node.left, level + 1)
 
 if __name__ == "__main__":
-    avl1 = AVLTree()
-    inp = input('Enter Input : ').split(',')
-    for i in inp:
-        parts = i.strip().split()
-        command = parts[0]
-        if command == "AD":
-            value = int(parts[1])
-            avl1.add(value)
-        elif command == "PR":
-            avl1.printTree()
+    avl = AVLTree()
+    commands = input('Enter Input : ').split(',')
+
+    for cmd in commands:
+        parts = cmd.strip().split()
+        operation = parts[0]
+
+        if operation == "AD":
+            avl.add(int(parts[1]))
+        elif operation == "PR":
+            avl.print_tree()
             print()
-        elif command == "PO":
-            avl1.postOrder()
+        elif operation == "PO":
+            avl.post_order()

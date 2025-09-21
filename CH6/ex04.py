@@ -1,36 +1,33 @@
 
-A, B, C = [], [], []
+rods = [[], [], []]
 
-def display_rods(n):
+def display(n):
     if n == 0:
         return
-    a = str(A[n-1]) if n-1 < len(A) else '|' 
-    b = str(B[n-1]) if n-1 < len(B) else '|'
-    c = str(C[n-1]) if n-1 < len(C) else '|'
-    print(f"{a}{b:^5}{c}")
-    display_rods(n - 1)
+    row = [str(rods[i][n-1]) if n-1 < len(rods[i]) else '|' for i in range(3)]
+    print(f"{row[0]}{row[1]:^5}{row[2]}")
+    display(n-1)
 
-def source_name(rod):
-    return 'A' if rod is A else 'B' if rod is B else 'C'
+def rod_name(rod):
+    return 'ABC'[rods.index(rod)]
 
-def move(n, A, B, C):
+def hanoi(n, src, dest, aux):
     if n == 1:
-        disk = A.pop()
-        B.append(disk)
-        print(f"move {disk} from  {source_name(A)} to {source_name(B)}")
-        display_rods(len(A)+len(B)+len(C)+1)
+        disk = src.pop()
+        dest.append(disk)
+        print(f"move {disk} from  {rod_name(src)} to {rod_name(dest)}")
+        display(len(rods[0]) + len(rods[1]) + len(rods[2])+1)
         return
-    move(n-1, A, C, B)
-    move(1, A, B, C)
-    move(n-1, C, B, A)
+    
+    hanoi(n-1, src, aux, dest)
+    hanoi(1, src, dest, aux)
+    hanoi(n-1, aux, dest, src)
 
 def main():
-    global A, B, C
     n = int(input("Enter Input : "))
-    A, B, C = list(range(n, 0, -1)), [], []
-
-    display_rods(n + 1)
-    move(n, A, C, B)
+    rods[0], rods[1], rods[2] = list(range(n, 0, -1)), [], []
+    display(n + 1)
+    hanoi(n, rods[0], rods[2], rods[1])
 
 if __name__ == "__main__":
     main()

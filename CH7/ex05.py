@@ -1,11 +1,8 @@
-# ex05.py for Chapter 7
 class Node:
     def __init__(self, data):
         self.data = data
-        self.left = None
-        self.right = None
-        self.next = None  
-    
+        self.left = self.right = self.next = None
+
     def __str__(self):
         return str(self.data)
 
@@ -15,72 +12,66 @@ class ExpressionTree:
 
     def insert_tree(self, expression):
         stack = []
-        operators = set(['+', '-', '*', '/', '^'])
         for char in expression:
-            if char not in operators:
-                node = Node(char)
-                stack.append(node)
+            if char not in '+-*/^':
+                stack.append(Node(char))
             else:
+                if len(stack) < 2:
+                    print("Invalid Postfix Expression")
+                    return
                 operator_node = Node(char)
-                if stack:
-                    operator_node.right = stack.pop()
-                else:
-                    print("Invalid Postfix Expression")
-                    return
-                if stack:
-                    operator_node.left = stack.pop()
-                else:
-                    print("Invalid Postfix Expression")
-                    return
+                operator_node.right = stack.pop()
+                operator_node.left = stack.pop()
                 stack.append(operator_node)
+
         if len(stack) == 1:
             self.root = stack.pop()
         else:
             print("Invalid Postfix Expression")
-            
-    def Inorder(self, node):
-        if node is not None:
+
+    def inorder(self, node):
+        if node:
             if node.left or node.right:
                 print('(', end='')
-            self.Inorder(node.left)
+            self.inorder(node.left)
             print(node.data, end='')
-            self.Inorder(node.right)
+            self.inorder(node.right)
             if node.left or node.right:
                 print(')', end='')
-                
-    def Preorder(self, node):
-        if node is not None:
+
+    def preorder(self, node):
+        if node:
             print(node.data, end='')
-            self.Preorder(node.left)
-            self.Preorder(node.right)
-    
-    def Postorder(self, node):
-        if node is not None:
-            self.Postorder(node.left)
-            self.Postorder(node.right)
+            self.preorder(node.left)
+            self.preorder(node.right)
+
+    def postorder(self, node):
+        if node:
+            self.postorder(node.left)
+            self.postorder(node.right)
             print(node.data, end='')
-        
-    def printTree(self, node, level=0):
-        if node is not None:
-            self.printTree(node.right, level + 1)
+
+    def print_tree(self, node, level=0):
+        if node:
+            self.print_tree(node.right, level + 1)
             print('     ' * level, node)
-            self.printTree(node.left, level + 1)
+            self.print_tree(node.left, level + 1)
 def main():
     tree = ExpressionTree()
     postfix = input("Enter Postfix : ")
     tree.insert_tree(postfix)
-    
+
     print("Tree :")
-    tree.printTree(tree.root)
-    
+    tree.print_tree(tree.root)
+
     print('--------------------------------------------------')
-    
+
     print("Infix : ", end='')
-    tree.Inorder(tree.root)
+    tree.inorder(tree.root)
     print()
-    
+
     print("Prefix : ", end='')
-    tree.Preorder(tree.root)
+    tree.preorder(tree.root)
     print()
 
 if __name__ == "__main__":

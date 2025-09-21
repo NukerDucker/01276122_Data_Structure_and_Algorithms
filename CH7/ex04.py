@@ -1,10 +1,8 @@
 class Node:
     def __init__(self, data):
         self.data = data
-        self.left = None
-        self.right = None
-        self.level = None
-    
+        self.left = self.right = None
+
     def __str__(self):
         return str(self.data)
 
@@ -16,39 +14,26 @@ class BinarySearchTree:
         if self.root is None:
             self.root = Node(data)
             return self.root
-        else:
-            return self._insert(self.root, data)
+        return self._insert(self.root, data)
 
     def _insert(self, node, data):
         if data == node.data:
             return node
-        elif data < node.data:
-            if node.left is None:
-                node.left = Node(data)
-            else:
-                self._insert(node.left, data)
-        else: 
-            if node.right is None:
-                node.right = Node(data)
-            else:
-                self._insert(node.right, data)
-        return node
-    
-    def find_node(self, node, data):
-        if node is None:
-            return None
-        if data == node.data:
-            return node
-        elif data < node.data:
-            return self.find_node(node.left, data)
+        if data < node.data:
+            node.left = Node(data) if node.left is None else self._insert(node.left, data)
         else:
-            return self.find_node(node.right, data)
+            node.right = Node(data) if node.right is None else self._insert(node.right, data)
+        return node
 
-    def get_inorder_successor(self, node):
-        current = node
-        while current.left is not None:
-            current = current.left
-        return current
+    def find_node(self, node, data):
+        if node is None or data == node.data:
+            return node
+        return self.find_node(node.left if data < node.data else node.right, data)
+
+    def get_min_node(self, node):
+        while node.left is not None:
+            node = node.left
+        return node
 
     def delete(self, node, data):
         if node is None:
@@ -60,31 +45,33 @@ class BinarySearchTree:
         else:
             if node.left is None:
                 return node.right
-            elif node.right is None:
+            if node.right is None:
                 return node.left
-            temp = self.get_inorder_successor(node.right)
-            node.data = temp.data
-            node.right = self.delete(node.right, temp.data)
+            successor = self.get_min_node(node.right)
+            node.data = successor.data
+            node.right = self.delete(node.right, successor.data)
         return node
 
-def printTree90(node, level = 0):
-    if node != None:
-        printTree90(node.right, level + 1)
+def print_tree(node, level=0):
+    if node is not None:
+        print_tree(node.right, level + 1)
         print('     ' * level, node)
-        printTree90(node.left, level + 1)
-        
+        print_tree(node.left, level + 1)
+
 tree = BinarySearchTree()
-data = input("Enter Input : ").split(",")
-for i in data:
-    if i[0] == 'i':
-        print("insert", i[2:])
-        root = tree.insert(int(i[2:]))
-        printTree90(tree.root)
-    elif i[0] == 'd':
-        val_to_delete = int(i[2:])
-        print("delete", val_to_delete)
-        if tree.find_node(tree.root, val_to_delete):
-            tree.root = tree.delete(tree.root, val_to_delete)
+commands = input("Enter Input : ").split(",")
+
+for cmd in commands:
+    action, value = cmd[0], int(cmd[2:])
+
+    if action == 'i':
+        print("insert", value)
+        tree.insert(value)
+        print_tree(tree.root)
+    elif action == 'd':
+        print("delete", value)
+        if tree.find_node(tree.root, value):
+            tree.root = tree.delete(tree.root, value)
         else:
             print("Error! Not Found DATA")
-        printTree90(tree.root)
+        print_tree(tree.root)
