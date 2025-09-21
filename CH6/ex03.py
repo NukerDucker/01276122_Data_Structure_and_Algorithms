@@ -1,4 +1,4 @@
-def gcd(a: int, b: int) -> :
+def gcd(a: int, b: int):
     if a == 0:
         return abs(b)
     return gcd(b % a, a)
