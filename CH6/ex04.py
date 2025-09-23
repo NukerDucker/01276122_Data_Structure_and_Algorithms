@@ -17,8 +17,13 @@ def hanoi(n, src, dest, aux):
         dest.append(disk)
         print(f"move {disk} from  {rod_name(src)} to {rod_name(dest)}")
         display(len(rods[0]) + len(rods[1]) + len(rods[2])+1)
+        print(src)
+        print(aux)
+        print(dest)
         return
-    
+    print(src)
+    print(aux)
+    print(dest)
     hanoi(n-1, src, aux, dest)
     hanoi(1, src, dest, aux)
     hanoi(n-1, aux, dest, src)
