@@ -1,4 +1,3 @@
-# ex03.py for Chapter 7
 class Node:
     def __init__(self, data):
         self.data = data
@@ -14,69 +13,72 @@ class BST:
     def insert(self, data):
         if self.root is None:
             self.root = Node(data)
-            return self.root
-        return self._insert(self.root, data)
+        else:
+            self._insert(self.root, data)
+        return self.root
 
     def _insert(self, node, data):
         if data == node.data:
-            return node
+            return
         if data < node.data:
-            if not node.left:
+            if node.left is None:
                 node.left = Node(data)
             else:
                 self._insert(node.left, data)
         else:
-            if not node.right:
+            if node.right is None:
                 node.right = Node(data)
             else:
                 self._insert(node.right, data)
-        return node
-
-    def inorder(self, node):
-        print('Inorder: ', end='')
-        self.Inorder(node)
-        print()
-
-    def Inorder(self, node):
-        if node:
-            self.Inorder(node.left)
-            print(node.data, end=' ')
-            self.Inorder(node.right)
 
     def preorder(self, node):
         print('Preorder: ', end='')
-        self.Preorder(node)
+        self._preorder(node)
         print()
 
-    def Preorder(self, node):
+    def _preorder(self, node):
         if node:
             print(node.data, end=' ')
-            self.Preorder(node.left)
-            self.Preorder(node.right)
+            self._preorder(node.left)
+            self._preorder(node.right)
+
+    def inorder(self, node):
+        print('Inorder: ', end='')
+        self._inorder(node)
+        print()
+
+    def _inorder(self, node):
+        if node:
+            self._inorder(node.left)
+            print(node.data, end=' ')
+            self._inorder(node.right)
 
     def postorder(self, node):
         print('Postorder: ', end='')
-        self.Postorder(node)
+        self._postorder(node)
         print()
 
-    def Postorder(self, node):
+    def _postorder(self, node):
         if node:
-            self.Postorder(node.left)
-            self.Postorder(node.right)
+            self._postorder(node.left)
+            self._postorder(node.right)
             print(node.data, end=' ')
 
-    def printTree(self, node, level=0):
+    def print_tree(self, node, level=0):
         if node:
-            self.printTree(node.right, level + 1)
+            self.print_tree(node.right, level + 1)
             print('     ' * level, node)
-            self.printTree(node.left, level + 1)
+            self.print_tree(node.left, level + 1)
 
-T = BST()
-inp = input('Enter Input : ').split()
-for i in inp:
-    root = T.insert(int(i))
+def main() -> None:
+    tree = BST()
+    values = input('Enter Input : ').split()
+    for value in values:
+        tree.insert(int(value))
+    tree.preorder(tree.root)
+    tree.inorder(tree.root)
+    tree.postorder(tree.root)
+    tree.print_tree(tree.root)
 
-T.preorder(T.root)
-T.inorder(T.root)
-T.postorder(T.root)
-T.printTree(T.root)
+if __name__ == "__main__":
+    main()
