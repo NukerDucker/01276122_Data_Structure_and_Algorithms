@@ -1,7 +1,8 @@
 class Node:
     def __init__(self, data):
         self.data = data
-        self.left = self.right = None
+        self.left = None
+        self.right = None
         self.height = 1
 
     def __str__(self):
@@ -12,9 +13,11 @@ class AVL:
         self.root = None
 
     def search(self, node, key):
-        if not node or node.data == key:
+        if node is None or node.data == key:
             return node
-        return self.search(node.left if key < node.data else node.right, key)
+        if key < node.data:
+            return self.search(node.left, key)
+        return self.search(node.right, key)
 
     def get_height(self, node):
         return node.height if node else 0
@@ -26,22 +29,26 @@ class AVL:
         new_root = node.right
         node.right = new_root.left
         new_root.left = node
-        node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
+
+        node.height = (1 + max(self.get_height(node.left), self.get_height(node.right)))
         new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
+
         return new_root
 
     def right_rotate(self, node):
         new_root = node.left
         node.left = new_root.right
         new_root.right = node
+
         node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
         new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
+
         return new_root
 
     def insert_node(self, node, key):
-        if not node:
+        if node is None:
             return Node(key)
-        if key < node.data:
+        elif key < node.data:
             node.left = self.insert_node(node.left, key)
         elif key > node.data:
             node.right = self.insert_node(node.right, key)
@@ -51,9 +58,8 @@ class AVL:
         node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
         balance = self.get_balance(node)
 
-        if abs(balance) > 1:
+        if balance != 1 and balance != -1 and balance != 0:
             print("Not Balance, Rebalance!")
-
         if balance > 1 and key < node.left.data:
             return self.right_rotate(node)
         if balance < -1 and key > node.right.data:
@@ -85,11 +91,11 @@ class AVL:
             self.postorder(node.right)
             print(node.data, end=' ')
 
-def print_tree_90(node, level=0):
-    if node:
-        print_tree_90(node.right, level + 1)
+def printTree90(node, level = 0):
+    if node != None:
+        printTree90(node.right, level + 1)
         print('     ' * level, node)
-        print_tree_90(node.left, level + 1)
+        printTree90(node.left, level + 1)
 
 myTree = AVL()
 root = None
@@ -98,5 +104,5 @@ data = input("Enter Input : ").split()
 for e in data:
     print("insert :",e)
     root = myTree.insert_node(root, int(e))
-    print_tree_90(root)
+    printTree90(root)
     print("===============")

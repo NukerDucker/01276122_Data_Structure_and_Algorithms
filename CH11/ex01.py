@@ -9,7 +9,7 @@ def main():
 
     edges = [edge.split() for edge in input_str.split(',')]
     vertices = sorted({v for edge in edges for v in edge}, key=sort_key)
-    
+
     n = len(vertices)
     matrix = [[0] * n for _ in range(n)]
 

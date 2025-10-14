@@ -1,7 +1,8 @@
 class Node:
     def __init__(self, data):
         self.data = data
-        self.left = self.right = None
+        self.left = None
+        self.right = None
         self.height = 1
 
     def __str__(self):
@@ -12,9 +13,11 @@ class AVL:
         self.root = None
 
     def search(self, node, key):
-        if not node or node.data == key:
+        if node is None or node.data == key:
             return node
-        return self.search(node.left if key < node.data else node.right, key)
+        if key < node.data:
+            return self.search(node.left, key)
+        return self.search(node.right, key)
 
     def get_height(self, node):
         return node.height if node else 0
@@ -26,22 +29,26 @@ class AVL:
         new_root = node.right
         node.right = new_root.left
         new_root.left = node
-        node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
+
+        node.height = (1 + max(self.get_height(node.left), self.get_height(node.right)))
         new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
+
         return new_root
 
     def right_rotate(self, node):
         new_root = node.left
         node.left = new_root.right
         new_root.right = node
+
         node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
         new_root.height = 1 + max(self.get_height(new_root.left), self.get_height(new_root.right))
+
         return new_root
 
     def insert_node(self, node, key):
-        if not node:
+        if node is None:
             return Node(key)
-        if key < node.data:
+        elif key < node.data:
             node.left = self.insert_node(node.left, key)
         elif key > node.data:
             node.right = self.insert_node(node.right, key)
@@ -61,30 +68,31 @@ class AVL:
         if balance < -1 and key < node.right.data:
             node.right = self.right_rotate(node.right)
             return self.left_rotate(node)
+
         return node
 
     def get_min_value_node(self, node):
-        while node and node.left:
-            node = node.left
-        return node
+        if node is None or node.left is None:
+            return node
+        return self.get_min_value_node(node.left)
 
     def delete_node(self, node, key):
-        if not node:
+        if node is None:
             return node
-        if key < node.data:
+        elif key < node.data:
             node.left = self.delete_node(node.left, key)
         elif key > node.data:
             node.right = self.delete_node(node.right, key)
         else:
-            if not node.left:
+            if node.left is None:
                 return node.right
-            if not node.right:
+            elif node.right is None:
                 return node.left
             temp = self.get_min_value_node(node.right)
             node.data = temp.data
             node.right = self.delete_node(node.right, temp.data)
 
-        if not node:
+        if node is None:
             return node
 
         node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
@@ -100,94 +108,72 @@ class AVL:
         if balance < -1 and self.get_balance(node.right) > 0:
             node.right = self.right_rotate(node.right)
             return self.left_rotate(node)
+
         return node
 
     def delete_root(self):
-        if not self.root:
+        """Delete the root node and return the new root"""
+        if self.root is None:
             return None
         root_value = self.root.data
         self.root = self.delete_node(self.root, root_value)
         return self.root
 
-def get_tree_height(node):
-    if not node:
-        return 0
-    return 1 + max(get_tree_height(node.left), get_tree_height(node.right))
-
 def print_levels(root):
     if not root:
-        print("Empty tree")
         return
 
-    height = get_tree_height(root)
-    queue = [(root, 0)]
-    current_level = 0
-    level_nodes = []
+    levels = root.height
+    queue = [root]
 
-    while queue:
-        node, level = queue.pop(0)
+    for level in range(1, levels + 1):
+        next_queue = []
+        left_pad = 1 + ((1 << (levels - level + 1)) - 1) * 2
+        between = 1 + ((1 << (levels - level + 2)) - 1) * 2
 
-        if level != current_level:
-            if level_nodes:
-                _print_level(level_nodes, current_level, height)
-            level_nodes = []
-            current_level = level
+        for node in queue:
+            next_queue.append(node.left if node else None)
+            next_queue.append(node.right if node else None)
 
-        level_nodes.append(node)
+        printable_nodes = [node for node in queue if node]
+        if not printable_nodes:
+            break
 
-        if level < height - 1:
-            if node:
-                queue.append((node.left, level + 1))
-                queue.append((node.right, level + 1))
-            else:
-                queue.append((None, level + 1))
-                queue.append((None, level + 1))
+        line = " " * left_pad
+        first = True
 
-    if level_nodes:
-        _print_level(level_nodes, current_level, height)
+        for node in printable_nodes:
+            if not first:
+                line += " " * (between - 1)
+            first = False
 
-def _print_level(nodes, level, total_height):
-    while nodes and nodes[-1] is None:
-        nodes.pop()
+            line += str(node.data)
+            if node.data < 10:
+                line += " "
 
-    if not nodes:
-        return
+        print(line)
+        queue = next_queue
 
-    spacing_multiplier = 2
-    spaces_before = (2 ** (total_height - level) - 1) * spacing_multiplier
-    spaces_between = (2 ** (total_height - level + 1) - 1) * spacing_multiplier
+        if all(node is None for node in queue):
+            break
 
-    line_parts = []
-    if spaces_before > 0:
-        line_parts.append(" " * spaces_before)
-
-    for i, node in enumerate(nodes):
-        if i > 0 and spaces_between > 0:
-            line_parts.append(" " * spaces_between)
-        if node is not None:
-            node_str = str(node.data)
-            if len(node_str) == 1:
-                node_str += " "
-            line_parts.append(node_str)
-        else:
-            line_parts.append("  ")
-
-    print("".join(line_parts))
-
-tree = AVL()
+myTree = AVL()
+root = None
 print(' *** AVL Tree ***')
 data = input("Enter numbers to insert: ").split()
 
-for num in data:
-    tree.root = tree.insert_node(tree.root, int(num))
+for e in data:
+    root = myTree.insert_node(root, int(e))
 
-print_levels(tree.root)
+myTree.root = root
+
+print_levels(root)
 print("------------------------------")
 
-while tree.root:
-    tree.delete_root()
-    if tree.root:
-        print_levels(tree.root)
+while myTree.root is not None:
+    myTree.delete_root()
+    if myTree.root is not None:
+        print_levels(myTree.root)
         print("------------------------------")
 
 print("===== End of program =====")

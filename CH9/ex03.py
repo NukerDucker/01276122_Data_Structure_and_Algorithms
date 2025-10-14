@@ -1,5 +1,3 @@
-# ex03.py for Chapter 9
-
 def get_sorted_type(arr: list) -> str:
     if len(set(arr)) == 1:
         return "Repdrome"
