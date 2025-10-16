@@ -1,54 +1,60 @@
-# ex03.py for Chapter Q3(Sort,Search)
+class Data:
+    def __init__(self, key, value):
+        self.key, self.value = key, value
 
-class HashTable:
+    def __str__(self):
+        return f"({self.key}, {self.value})"
+
+class Hash:
     def __init__(self, size, max_collision):
-        self.size = size
-        self.max_collision = max_collision
-        self.table = [None] * size
+        self.size = int(size)
+        self.max_collision = int(max_collision)
+        self.table = [None] * self.size
+        self.table_full_shown = False
 
     def hash_function(self, key):
-        return key % self.size
+        return sum(ord(char) for char in key) % self.size
 
-    def insert(self, key):
-        index = self.hash_function(key)
-        original_index = index
-        collision_count = 0
+    def is_full(self):
+        return all(item is not None for item in self.table)
+
+    def display(self):
+        for i, item in enumerate(self.table, 1):
+            print(f"#{i}\t{item}")
+        print("---------------------------")
+
+    def insert(self, data):
+        if self.is_full():
+            if not self.table_full_shown:
+                print("This table is full !!!!!!")
+                self.table_full_shown = True
+            return
+
+        index = original_index = self.hash_function(data.key)
 
         if self.table[index] is None:
-            self.table[index] = key
-            return True
+            self.table[index] = data
+            self.display()
+            return
 
-        i = 1
-        while collision_count < self.max_collision:
-            print(f"collision number {collision_count + 1} at {index}")
-            collision_count += 1
-
+        for i in range(1, self.max_collision + 1):
+            print(f"collision number {i} at {index}")
             index = (original_index + i * i) % self.size
 
             if self.table[index] is None:
-                self.table[index] = key
-                return True
-
-            i += 1
+                self.table[index] = data
+                self.display()
+                return
 
         print("Max of collisionChain")
-        return False
-
-    def display(self):
-        for i in range(self.size):
-            print(f"#{i + 1}\t{self.table[i]}")
-        print("---------------------------")
-
-def main():
-    inp = input("Enter Input : ").split("/")
-    size, max_col = map(int, inp[0].split())
-    keys = list(map(int, inp[1].split()))
-
-    ht = HashTable(size, max_col)
-
-    for key in keys:
-        ht.insert(key)
-        ht.display()
+        self.display()
 
 if __name__ == "__main__":
-    main()
+    print(' ***** Fun with hashing *****')
+    params, data = input('Enter Input : ').split("/")
+    tsize, max_collision = params.split()
+
+    hash_table = Hash(tsize, max_collision)
+    for item in data.split(','):
+        key, value = item.split()
+        hash_table.insert(Data(key, value))
